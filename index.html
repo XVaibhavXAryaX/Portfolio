@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vaibhav Arya - AI & ML Explorer</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #00d2ff;
+            --secondary: #3a7bd5;
+            --accent: #00ffaa;
+            --bg-dark: #0a0a0a;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #e0e0e0;
+            font-family: 'Fira Code', monospace;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        /* Custom Cursor */
+        .cursor-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--accent);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            mix-blend-mode: screen;
+        }
+
+        .cursor-ring {
+            width: 30px;
+            height: 30px;
+            border: 2px solid var(--primary);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s, height 0.3s;
+        }
+        
+        /* Glassmorphism */
+        .glassmorphic {
+            background: rgba(16, 16, 16, 0.6);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Neon Glow Effect */
+        .neon-glow {
+            box-shadow: 0 0 5px var(--primary), 0 0 10px var(--primary), 0 0 20px var(--secondary);
+        }
+        .neon-text {
+            text-shadow: 0 0 5px var(--accent), 0 0 10px var(--accent);
+        }
+
+        /* Gradient Text */
+        .gradient-text {
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        /* Gradient Border */
+        .gradient-border {
+            border: 2px solid;
+            border-image-slice: 1;
+            border-image-source: linear-gradient(to right, var(--primary), var(--secondary));
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #111;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(var(--secondary), var(--primary));
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(var(--primary), var(--secondary));
+        }
+
+        /* Nav Link Underline */
+        .nav-link {
+            position: relative;
+            transition: color 0.3s;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            transform: scaleX(0);
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background-color: var(--accent);
+            transform-origin: bottom right;
+            transition: transform 0.3s ease-out;
+        }
+        .nav-link:hover {
+            color: var(--accent);
+        }
+        .nav-link:hover::after {
+            transform: scaleX(1);
+            transform-origin: bottom left;
+        }
+    </style>
+</head>
+
+<body class="antialiased">
+    <!-- Custom Cursor -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-ring"></div>
+
+    <!-- 3D Matrix Background -->
+    <div id="matrix-canvas-container" class="fixed top-0 left-0 w-full h-full -z-10"></div>
+
+    <!-- Header -->
+    <header id="navbar" class="fixed top-0 left-0 w-full z-50 transition-all duration-300 glassmorphic">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#home" class="text-2xl font-bold gradient-text">VaibhavArya</a>
+            <nav class="hidden md:flex space-x-8">
+                <a href="#home" class="nav-link">Home</a>
+                <a href="#about" class="nav-link">About</a>
+                <a href="#skills" class="nav-link">Skills</a>
+                <a href="#experience" class="nav-link">Experience</a>
+                <a href="#projects" class="nav-link">Projects</a>
+                <a href="#contact" class="nav-link">Contact</a>
+            </nav>
+            <button id="mobile-menu-btn" class="md:hidden z-50">
+                <i class="fas fa-bars text-2xl text-white"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="fixed top-0 left-0 w-full h-screen glassmorphic z-40 flex flex-col justify-center items-center space-y-8 text-2xl transform -translate-x-full transition-transform duration-500 ease-in-out">
+        <a href="#home" class="mobile-nav-link">Home</a>
+        <a href="#about" class="mobile-nav-link">About</a>
+        <a href="#skills" class="mobile-nav-link">Skills</a>
+        <a href="#experience" class="mobile-nav-link">Experience</a>
+        <a href="#projects" class="mobile-nav-link">Projects</a>
+        <a href="#contact" class="mobile-nav-link">Contact</a>
+    </div>
+
+    <main>
+        <!-- Hero Section -->
+        <section id="home" class="h-screen flex items-center justify-center relative overflow-hidden">
+            <div class="text-center p-4 z-10 hero-content">
+                <div class="terminal-box glassmorphic p-8 rounded-lg border border-cyan-400/20 max-w-3xl mx-auto shadow-2xl shadow-cyan-500/10">
+                    <div class="terminal-header flex items-center pb-4">
+                        <div class="flex space-x-2">
+                            <span class="w-3 h-3 bg-red-500 rounded-full"></span>
+                            <span class="w-3 h-3 bg-yellow-500 rounded-full"></span>
+                            <span class="w-3 h-3 bg-green-500 rounded-full"></span>
+                        </div>
+                        <span class="flex-grow text-center text-gray-400">bash - vaibhav.DEV</span>
+                    </div>
+                    <div class="terminal-body text-left font-mono">
+                        <div id="terminal-text" class="text-lg md:text-xl"></div>
+                    </div>
+                </div>
+                 <div class="mt-8 flex justify-center gap-4 hero-buttons">
+                    <!-- UPDATED: Project button style -->
+                    <a href="#projects" class="px-6 py-3 border-2 border-white text-white font-bold rounded-md hover:bg-white hover:text-black transition-colors">View Projects</a>
+                    <a href="#contact" class="px-6 py-3 border-2 border-accent text-accent font-bold rounded-md relative overflow-hidden contact-btn hover:bg-accent hover:text-black transition-colors">
+                        <span class="relative z-10">Contact Me</span>
+                    </a>
+                </div>
+            </div>
+            <div class="absolute bottom-8 left-1/2 -translate-x-1/2 scroll-indicator">
+                 <a href="#about" class="animate-bounce block">
+                    <i class="fas fa-chevron-down text-2xl text-primary"></i>
+                </a>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="py-20 container mx-auto px-6 overflow-hidden">
+            <h2 class="text-4xl text-center mb-12 gradient-text">About Me</h2>
+            <div class="grid md:grid-cols-5 gap-12 items-center">
+                <div class="md:col-span-2 about-image">
+                    <div class="relative w-full max-w-sm mx-auto p-2">
+                        <div class="absolute inset-0 rounded-lg border-2 border-primary -rotate-3 transition-transform duration-500"></div>
+                        <div class="absolute inset-0 rounded-lg border-2 border-accent rotate-3 transition-transform duration-500"></div>
+                        <img src="https://picsum.photos/id/870/200/300?grayscale&blur=2" alt="Vaibhav Arya" class="relative rounded-lg z-10 w-full h-auto">
+                    </div>
+                </div>
+                <div class="md:col-span-3 about-content">
+                    <h3 class="text-3xl font-bold mb-4">I'm Vaibhav Arya</h3>
+                    <p class="mb-4 text-gray-300">
+                        An enthusiastic and data driven specializing in Artificial Intelligence (AI) and Machine Learning (ML). With a solid foundation in computer science and a passion for creating innovative solutions, I bridge the gap between complex back-end logic and engaging user interfaces.
+                    </p>
+                    <p class="mb-6 text-gray-300">
+                        I thrive on applying theoretical knowledge to real-world problems, leveraging modern tools like React, Node.js, and Python to build and deploy dynamic, high-performance applications. My expertise spans data preprocessing, feature engineering, and crafting seamless user experiences. I'm eager to contribute to cutting-edge projects and continuously advance my skills in this rapidly evolving field.
+                    </p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                        <p><strong>Email:</strong> vkarya711@gmail.com</p>
+                        <p><strong>Phone:</strong> +919870539864</p>
+                        <p><strong>Location:</strong> New Delhi, Delhi, India</p>
+                    </div>
+                    <div class="flex space-x-4">
+                        <a href="https://github.com/XVaibhavXAryaX" target="_blank" class="text-3xl hover:text-primary transition-colors"><i class="fab fa-github"></i></a>
+                        <a href="#" class="text-3xl hover:text-primary transition-colors"><i class="fab fa-linkedin"></i></a>
+                        <a href="#" class="text-3xl hover:text-primary transition-colors"><i class="fab fa-twitter"></i></a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Skills Section -->
+        <section id="skills" class="py-20 bg-black/20 overflow-hidden">
+            <div class="container mx-auto px-6">
+                <h2 class="text-4xl text-center mb-12 gradient-text">My Arsenal</h2>
+                <div class="skills-marquee relative h-auto">
+                    <div class="skills-track flex">
+                        <!-- Content is generated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Experience Section -->
+        <section id="experience" class="py-20 container mx-auto px-6">
+            <h2 class="text-4xl text-center mb-16 gradient-text">Internship Timeline</h2>
+            <div class="relative">
+                <div class="absolute left-1/2 -translate-x-1/2 h-full w-1 bg-gradient-to-b from-primary to-accent rounded-full"></div>
+                
+                <div class="space-y-16">
+                    <!-- Timeline Item 1 -->
+                    <div class="timeline-item relative flex items-center">
+                        <div class="w-1/2 pr-8 text-right">
+                            <div class="p-6 glassmorphic rounded-lg border-l-4 border-primary">
+                                <h3 class="text-xl font-bold text-primary">Full Stack Developer</h3>
+                                <p class="text-md text-gray-300">Radiant Classes</p>
+                                <p class="text-sm text-gray-400 mt-2">2021 – 2022</p>
+                                <p class="text-sm mt-3">Leading development of next-gen WebGL applications and overseeing cloud infrastructure on AWS.</p>
+                                <div class="mt-3 text-xs flex flex-wrap gap-2 justify-end">
+                                    <span class="bg-cyan-900/50 text-cyan-300 px-2 py-1 rounded">React</span>
+                                    <span class="bg-cyan-900/50 text-cyan-300 px-2 py-1 rounded">Node.js</span>
+                                    <span class="bg-cyan-900/50 text-cyan-300 px-2 py-1 rounded">HTML</span>
+                                    <span class="bg-cyan-900/50 text-cyan-300 px-2 py-1 rounded">AWS</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="absolute left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-secondary flex items-center justify-center font-mono text-lg neon-glow">;</div>
+                        <div class="w-1/2 pl-8"></div>
+                    </div>
+                    <!-- Timeline Item 2 -->
+                    <div class="timeline-item relative flex items-center">
+                         <div class="w-1/2 pr-8"></div>
+                        <div class="absolute left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-secondary flex items-center justify-center font-mono text-lg neon-glow">;</div>
+                        <div class="w-1/2 pl-8 text-left">
+                            <div class="p-6 glassmorphic rounded-lg border-r-4 border-accent">
+                                <h3 class="text-xl font-bold text-accent">Machine Learning Intern</h3>
+                                <p class="text-md text-gray-300">Udemy</p>
+                                <p class="text-sm text-gray-400 mt-2">2023 – 2024</p>
+                                <p class="text-sm mt-3">Experienced in applying theoretical knowledge to real-world problems, leveraging tools such as Python, TensorFlow, and scikit-learn to build and deploy AI/ML models.</p>
+                                <div class="mt-3 text-xs flex flex-wrap gap-2 justify-start">
+                                    <span class="bg-green-900/50 text-green-300 px-2 py-1 rounded">Python</span>
+                                    <span class="bg-green-900/50 text-green-300 px-2 py-1 rounded">TensorFlow</span>
+                                    <span class="bg-green-900/50 text-green-300 px-2 py-1 rounded">scikit-learn</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Projects Section -->
+        <section id="projects" class="py-20 bg-black/20">
+            <div class="container mx-auto px-6">
+                <h2 class="text-4xl text-center mb-12 gradient-text">Featured Projects</h2>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Project 1 -->
+                    <div class="project-card glassmorphic rounded-lg overflow-hidden group">
+                        <div class="relative overflow-hidden">
+                            <img src="https://picsum.photos/200/300/?blur=2" alt="Gun Detection Project" class="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+                            <div class="absolute inset-0 bg-gradient-to-r from-primary to-accent opacity-0 group-hover:opacity-70 transition-opacity duration-500 scanner-overlay"></div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-primary">AI Gun Detection API</h3>
+                            <p class="text-sm text-gray-300 my-2">A FastAPI-based application using a pre-trained Faster R-CNN model to detect guns in images, returning processed images with detections marked.</p>
+                            <div class="flex flex-wrap gap-2 my-4">
+                                <span class="text-xs bg-gray-700 px-2 py-1 rounded-full">FastAPI</span>
+                                <span class="text-xs bg-gray-700 px-2 py-1 rounded-full">Python</span>
+                                <span class="text-xs bg-gray-700 px-2 py-1 rounded-full">R-CNN</span>
+                            </div>
+                            <div class="flex gap-4 mt-4">
+                                <a href="#" target="_blank" class="px-4 py-2 text-sm bg-primary text-black rounded font-bold hover:bg-opacity-80 transition-colors">LINK--></a>
+                                <!-- UPDATED: Added project link -->
+                                <a href="https://github.com/vaibhav-arya/gun-detection-api" target="_blank" class="px-4 py-2 text-sm border border-secondary text-secondary rounded font-bold hover:bg-secondary hover:text-black transition-colors">Code</a>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Project 2 -->
+                    <div class="project-card glassmorphic rounded-lg overflow-hidden group">
+                        <div class="relative overflow-hidden">
+                            <img src="https://picsum.photos/200/300/?blur=2" alt="House Prediction Project" class="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500">
+                             <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+                             <div class="absolute inset-0 bg-gradient-to-r from-primary to-accent opacity-0 group-hover:opacity-70 transition-opacity duration-500 scanner-overlay"></div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-primary">House Price Prediction Model</h3>
+                            <p class="text-sm text-gray-300 my-2">Developed a machine learning model using Linear Regression to predict house prices from a Kaggle dataset, achieving an R-squared value of 0.88.</p>
+                            <div class="flex flex-wrap gap-2 my-4">
+                                <span class="text-xs bg-gray-700 px-2 py-1 rounded-full">Scikit-learn</span>
+                                <span class="text-xs bg-gray-700 px-2 py-1 rounded-full">Pandas</span>
+                                <span class="text-xs bg-gray-700 px-2 py-1 rounded-full">Kaggle</span>
+                            </div>
+                            <div class="flex gap-4 mt-4">
+                                <a href="#" target="_blank" class="px-4 py-2 text-sm bg-primary text-black rounded font-bold hover:bg-opacity-80 transition-colors">LINK--></a>
+                                <!-- UPDATED: Added project link -->
+                                <a href="https://github.com/XVaibhavXAryaX/house-Price_prediction.git" target="_blank" class="px-4 py-2 text-sm border border-secondary text-secondary rounded font-bold hover:bg-secondary hover:text-black transition-colors">Code</a>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Project 3 -->
+                    <div class="project-card glassmorphic rounded-lg overflow-hidden group">
+                        <div class="relative overflow-hidden">
+                            <img src="https://picsum.photos/200/300/?blur=2" alt="Data Visualization Dashboard" class="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500">
+                             <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+                             <div class="absolute inset-0 bg-gradient-to-r from-primary to-accent opacity-0 group-hover:opacity-70 transition-opacity duration-500 scanner-overlay"></div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-primary">Cab Cancellation Prediction</h3>
+                            <p class="text-sm text-gray-300 my-2">A real-time, interactive 3D data visualization dashboard showing cab cancellation rate.</p>
+                            <div class="flex flex-wrap gap-2 my-4">
+                                <span class="text-xs bg-gray-700 px-2 py-1 rounded-full">Python</span>
+                                <span class="text-xs bg-gray-700 px-2 py-1 rounded-full">Pandas</span>
+                                <span class="text-xs bg-gray-700 px-2 py-1 rounded-full">Kaggle</span>
+                            </div>
+                            <div class="flex gap-4 mt-4">
+                                <a href="#" target="_blank" class="px-4 py-2 text-sm bg-primary text-black rounded font-bold hover:bg-opacity-80 transition-colors">LINK--></a>
+                                <!-- UPDATED: Added project link -->
+                                <a href="https://github.com/vaibhav-arya/interactive-3d-dashboard" target="_blank" class="px-4 py-2 text-sm border border-secondary text-secondary rounded font-bold hover:bg-secondary hover:text-black transition-colors">Code</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Education Section -->
+        <section id="education" class="py-20 container mx-auto px-6 overflow-hidden">
+             <h2 class="text-4xl text-center mb-16 gradient-text">Education</h2>
+             <div class="relative w-full">
+                <div class="absolute top-1/2 -translate-y-1/2 left-0 w-full h-1 bg-gradient-to-r from-primary to-accent"></div>
+                <div class="relative flex justify-between education-timeline">
+                    <!-- Education Item -->
+                      <div class="education-item w-1/3 text-center">
+                        <div class="bg-bg-dark p-4 relative">
+                            <div class="absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 w-6 h-6 bg-accent rounded-full neon-glow transform scale-125"></div>
+                            <h3 class="text-lg text-accent font-bold">2018 - 2022 </h3>
+                            <p class="font-semibold mt-2">Guru Nanak Dev Institute of Technology</p>
+                            <p class="text-sm text-gray-400">Diploma in Computer engineering</p>
+                            <p class="text-xs text-gray-500 mt-1">GPA: 7.0</p>
+                        </div>
+                    </div>
+                     <!---->
+                    <div class="education-item w-1/3 text-center">
+                        <div class="bg-bg-dark p-4 relative">
+                            <div class="absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 w-6 h-6 bg-accent rounded-full neon-glow transform scale-125"></div>
+                            <h3 class="text-lg text-accent font-bold">2022 - 2026 </h3>
+                            <p class="font-semibold mt-2">Guru Tegh Bahadur Institute of Technology</p>
+                            <p class="text-sm text-gray-400">Bachelor of Technology in AI/ML</p>
+                            <p class="text-xs text-gray-500 mt-1">GPA: 7.0</p>
+                        </div>
+                    </div>
+                    <!-- Add more education items here if needed -->
+                </div>
+             </div>
+        </section>
+
+
+        <!-- Contact Section -->
+        <section id="contact" class="py-20 bg-black/20">
+            <div class="container mx-auto px-6">
+                <h2 class="text-4xl text-center mb-12 gradient-text">Get In Touch</h2>
+                <div class="grid md:grid-cols-2 gap-12">
+                    <div class="contact-info">
+                        <h3 class="text-3xl font-bold mb-4">Let's Connect</h3>
+                        <p class="text-gray-300 mb-6">Have a project in mind or just want to say hi? Feel free to reach out. I'm always open to discussing new ideas and opportunities.</p>
+                        <div class="space-y-4">
+                            <div class="flex items-center gap-4">
+                                <i class="fas fa-map-marker-alt text-2xl text-primary"></i>
+                                <span>New Delhi, Delhi, India</span>
+                            </div>
+                             <div class="flex items-center gap-4">
+                                <i class="fas fa-envelope text-2xl text-primary"></i>
+                                <span>vkarya711@gmail.com</span>
+                            </div>
+                             <div class="flex items-center gap-4">
+                                <i class="fas fa-phone text-2xl text-primary"></i>
+                                <span>+919870539864</span>
+                            </div>
+                        </div>
+                         <div class="flex space-x-6 mt-8">
+                            <a href="https://github.com/vaibhav-arya" target="_blank" class="text-4xl hover:text-primary transition-colors"><i class="fab fa-github"></i></a>
+                            <a href="#" class="text-4xl hover:text-primary transition-colors"><i class="fab fa-linkedin"></i></a>
+                            <a href="#" class="text-4xl hover:text-primary transition-colors"><i class="fab fa-twitter"></i></a>
+                        </div>
+                    </div>
+                    <form class="contact-form space-y-4">
+                        <input type="text" placeholder="Your Name" class="w-full bg-gray-800/50 p-3 rounded-md border border-gray-700 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all glow-on-focus">
+                        <input type="email" placeholder="Your Email" class="w-full bg-gray-800/50 p-3 rounded-md border border-gray-700 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all glow-on-focus">
+                        <input type="text" placeholder="Subject" class="w-full bg-gray-800/50 p-3 rounded-md border border-gray-700 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all glow-on-focus">
+                        <textarea placeholder="Your Message" rows="5" class="w-full bg-gray-800/50 p-3 rounded-md border border-gray-700 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all glow-on-focus"></textarea>
+                        <button type="submit" class="w-full py-3 font-bold bg-gradient-to-r from-primary to-secondary text-black rounded-md magnetic-btn">
+                            Send Message
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-8 border-t border-gray-800">
+        <div class="container mx-auto px-6 text-center text-gray-500">
+            <a href="#home" class="text-xl font-bold gradient-text mb-4 inline-block">VaibhavArya</a>
+            <div class="flex justify-center space-x-6 mb-4">
+                <a href="#about" class="hover:text-primary transition-colors">About</a>
+                <a href="#projects" class="hover:text-primary transition-colors">Projects</a>
+                <a href="#contact" class="hover:text-primary transition-colors">Contact</a>
+            </div>
+            <p>© 2025 Vaibhav Arya. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- JS Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/TextPlugin.min.js"></script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        gsap.registerPlugin(ScrollTrigger, TextPlugin);
+
+        // --- 1. Custom Cursor ---
+        const cursorDot = document.querySelector('.cursor-dot');
+        const cursorRing = document.querySelector('.cursor-ring');
+
+        gsap.set(cursorDot, { xPercent: -50, yPercent: -50 });
+        gsap.set(cursorRing, { xPercent: -50, yPercent: -50 });
+        
+        let mouseX = 0, mouseY = 0;
+        let ringX = 0, ringY = 0;
+
+        window.addEventListener('mousemove', e => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            gsap.to(cursorDot, 0.1, { x: mouseX, y: mouseY });
+        });
+        
+        gsap.ticker.add(() => {
+             ringX += (mouseX - ringX) * 0.1;
+             ringY += (mouseY - ringY) * 0.1;
+             gsap.set(cursorRing, { x: ringX, y: ringY });
+        });
+
+        document.querySelectorAll('a, button, .project-card, .timeline-item').forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                gsap.to(cursorRing, { scale: 1.5, borderColor: 'var(--accent)' });
+            });
+            el.addEventListener('mouseleave', () => {
+                gsap.to(cursorRing, { scale: 1, borderColor: 'var(--primary)' });
+            });
+        });
+
+
+        // --- 2. 3D Matrix Background ---
+        const container = document.getElementById('matrix-canvas-container');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        container.appendChild(renderer.domElement);
+
+        const charSet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789{}[]();:<>/?|';
+        const characters = [];
+
+        const fontLoader = new THREE.FontLoader();
+        fontLoader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', font => {
+            const material = new THREE.MeshBasicMaterial({ color: 0x00d2ff, transparent: true, opacity: 0.7 });
+            for (let i = 0; i < 500; i++) {
+                const char = charSet[Math.floor(Math.random() * charSet.length)];
+                const geometry = new THREE.TextGeometry(char, {
+                    font: font,
+                    size: 0.5,
+                    height: 0.01,
+                });
+                const mesh = new THREE.Mesh(geometry, material.clone());
+                mesh.position.set(
+                    (Math.random() - 0.5) * 40,
+                    (Math.random() - 0.5) * 40,
+                    (Math.random() - 0.5) * 40
+                );
+                mesh.rotation.y = Math.random() * Math.PI;
+                characters.push(mesh);
+                scene.add(mesh);
+            }
+        });
+
+        camera.position.z = 20;
+
+        document.addEventListener('mousemove', (event) => {
+            const mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+            const mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+            gsap.to(camera.position, {
+                x: mouseX * 2,
+                y: mouseY * 2,
+                duration: 1,
+                ease: "power2.out"
+            });
+        });
+
+        function animate() {
+            requestAnimationFrame(animate);
+            characters.forEach(char => {
+                char.position.y -= 0.02;
+                if (char.position.y < -20) char.position.y = 20;
+            });
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+        
+        // --- 3. Navigation Animations ---
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileMenuIcon = mobileMenuBtn.querySelector('i');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            if (mobileMenu.classList.contains('-translate-x-full')) {
+                gsap.to(mobileMenu, { x: 0, duration: 0.5, ease: 'power3.inOut' });
+                mobileMenuIcon.classList.replace('fa-bars', 'fa-times');
+            } else {
+                gsap.to(mobileMenu, { x: '-100%', duration: 0.5, ease: 'power3.inOut' });
+                mobileMenuIcon.classList.replace('fa-times', 'fa-bars');
+            }
+        });
+
+        document.querySelectorAll('.mobile-nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                gsap.to(mobileMenu, { x: '-100%', duration: 0.5, ease: 'power3.inOut' });
+                mobileMenuIcon.classList.replace('fa-times', 'fa-bars');
+            });
+        });
+        
+        // --- 4. Hero Section Animations ---
+        gsap.from('.hero-content', { opacity: 0, y: 50, duration: 1, delay: 0.5 });
+        gsap.from('.hero-buttons a', { opacity: 0, y: 20, stagger: 0.2, duration: 0.8, delay: 2.5 });
+        gsap.from('.scroll-indicator', { opacity: 0, y: 20, duration: 1, delay: 3 });
+
+        gsap.to('#terminal-text', {
+            text: {
+                value: `> Hello_World()<br/>I'm Vaibhav Arya, a AI&ML Explorer.<br/>const specialties = ["EXCEL", "POWER BI", "SQL", "PYTHON"];<span class="animate-ping">_</span>`
+            },
+            duration: 2,
+            ease: "none",
+            delay: 1
+        });
+        
+        // --- 5. Scroll-Based Animations ---
+        gsap.from('.about-image', { x: -100, opacity: 0, duration: 1, scrollTrigger: { trigger: '#about', start: 'top 70%' } });
+        gsap.from('.about-content', { x: 100, opacity: 0, duration: 1, scrollTrigger: { trigger: '#about', start: 'top 70%' } });
+        
+        // --- UPDATED: Skills Section "Sliding Window" ---
+        const skills = [
+            { icon: 'fab fa-js', name: 'JavaScript', level: '95%' },
+            { icon: 'fab fa-react', name: 'React', level: '90%' },
+            { icon: 'fas fa-cube', name: 'Three.js', level: '85%' },
+            { icon: 'fab fa-node-js', name: 'Node.js', level: '88%' },
+            { icon: 'fas fa-database', name: 'SQL/MongoDB', level: '92%' },
+            { icon: 'fab fa-python', name: 'Python', level: '94%' },
+            { icon: 'fas fa-cloud', name: 'Cloud (AWS/GCP)', level: '80%' },
+            { icon: 'fas fa-robot', name: 'Machine Learning', level: '85%' },
+        ];
+        
+        const skillsTrack = document.querySelector('.skills-track');
+        const skillsContent = skills.map(skill => `
+            <div class="skill-card glassmorphic rounded-lg p-6 flex-shrink-0 w-64 mx-4 group">
+                <i class="${skill.icon} text-4xl text-accent mb-4"></i>
+                <h3 class="text-xl font-bold">${skill.name}</h3>
+                <div class="w-full bg-gray-700 rounded-full h-2.5 mt-4">
+                    <div class="bg-gradient-to-r from-primary to-accent h-2.5 rounded-full" style="width: ${skill.level}"></div>
+                </div>
+                <p class="text-right text-sm mt-1 text-accent">${skill.level}</p>
+            </div>
+        `).join('');
+        
+        skillsTrack.innerHTML = skillsContent + skillsContent;
+
+        // Staggered entrance animation for skill cards
+        gsap.from(".skill-card", {
+            y: 100,
+            opacity: 0,
+            stagger: 0.1,
+            duration: 0.5,
+            ease: "power2.out",
+            scrollTrigger: {
+                trigger: "#skills",
+                start: "top 70%",
+                toggleActions: "play none none reverse"
+            }
+        });
+
+        // Marquee animation
+        gsap.to(skillsTrack, {
+            xPercent: -50,
+            ease: 'none',
+            duration: 40,
+            repeat: -1
+        });
+
+        document.querySelectorAll('.timeline-item').forEach(item => {
+            const content = item.querySelector('.glassmorphic');
+            const direction = item.children[0].classList.contains('text-right') ? -100 : 100;
+            gsap.from(content, {
+                x: direction,
+                opacity: 0,
+                duration: 0.8,
+                scrollTrigger: { trigger: item, start: 'top 80%', toggleActions: 'play none none reverse' }
+            });
+             gsap.from(item.querySelector('.bg-secondary'), {
+                scale: 0,
+                duration: 0.5,
+                scrollTrigger: { trigger: item, start: 'top 80%', toggleActions: 'play none none reverse' }
+            });
+        });
+
+        gsap.from(".project-card", {
+            y: 50,
+            scale: 0.9,
+            opacity: 0,
+            stagger: 0.2,
+            duration: 0.7,
+            ease: "back.out(1.7)",
+            scrollTrigger: { trigger: "#projects", start: "top 70%" }
+        });
+
+         gsap.from(".education-item", {
+            scale: 0.8,
+            opacity: 0,
+            stagger: 0.3,
+            duration: 0.8,
+            ease: "power2.out",
+            scrollTrigger: { trigger: "#education", start: "top 70%" }
+        });
+
+        gsap.from(".contact-info", { x: -100, opacity: 0, duration: 1, scrollTrigger: { trigger: "#contact", start: "top 70%" } });
+        gsap.from(".contact-form", { x: 100, opacity: 0, duration: 1, scrollTrigger: { trigger: "#contact", start: "top 70%" } });
+        
+        document.querySelectorAll('.glow-on-focus').forEach(input => {
+            input.addEventListener('focus', (e) => e.target.style.boxShadow = `0 0 10px var(--primary), 0 0 5px var(--primary) inset`);
+            input.addEventListener('blur', (e) => e.target.style.boxShadow = 'none');
+        });
+
+        const magneticBtn = document.querySelector('.magnetic-btn');
+        if (magneticBtn) {
+            magneticBtn.addEventListener('mousemove', function(e) {
+                const rect = this.getBoundingClientRect();
+                const x = (e.clientX - rect.left - rect.width / 2) * 0.4;
+                const y = (e.clientY - rect.top - rect.height / 2) * 0.4;
+                gsap.to(this, { x: x, y: y, duration: 0.3 });
+            });
+            magneticBtn.addEventListener('mouseleave', () => gsap.to(this, { x: 0, y: 0, duration: 0.3 }));
+        }
+    });
+    </script>
+</body>
+</html>
